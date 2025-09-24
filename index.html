@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FairPay Checker</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>FairPay Checker</h1>
+      <p>
+        Millions of workers are underpaid and don’t even know it. Use our free
+        tool to instantly check if your paycheck is fair — in under 30 seconds.
+      </p>
+    </header>
+
+    <div class="container">
+      <h2>Check Your Pay</h2>
+      <form id="payForm">
+        <label for="hoursWorked">Hours Worked (this week)</label>
+        <input type="number" id="hoursWorked" name="hoursWorked" required />
+
+        <label for="hourlyRate">Hourly Rate ($)</label>
+        <input
+          type="number"
+          id="hourlyRate"
+          name="hourlyRate"
+          step="0.01"
+          required
+        />
+
+        <label for="totalPayReceived">Total Pay Received ($)</label>
+        <input
+          type="number"
+          id="totalPayReceived"
+          name="totalPayReceived"
+          step="0.01"
+          required
+        />
+
+        <button type="submit">Check My Pay</button>
+      </form>
+
+      <div id="result">
+        <h3>Your Report</h3>
+        <p id="expected"></p>
+        <p id="overtime"></p>
+        <p id="underpayment"></p>
+        <p id="message"></p>
+      </div>
+    </div>
+  </body>
+</html>
