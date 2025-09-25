@@ -11,6 +11,7 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
     totalPayReceived: parseFloat(
       document.getElementById("totalPayReceived").value
     ),
+    state: document.getElementById("state").value,
   };
 
   try {
