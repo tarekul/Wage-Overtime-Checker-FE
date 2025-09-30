@@ -61,12 +61,14 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
         "message"
       ).innerHTML = `<span class="ok">✅ No underpayment detected. Your pay appears correct.</span>`;
     }
-  } catch (_) {
+  } catch (error) {
     // Hide loading and show error
     document.getElementById("loading").style.display = "none";
     document.getElementById("result").style.display = "block";
     document.getElementById(
       "message"
-    ).innerHTML = `<span class="violation">❌ Error: Could not reach server. Please try again later.</span>`;
+    ).innerHTML = `<span class="violation">❌ Error: ${
+      error.message || error
+    }. Please try again later.</span>`;
   }
 });
