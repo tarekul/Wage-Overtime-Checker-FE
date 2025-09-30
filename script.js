@@ -61,7 +61,7 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
         "message"
       ).innerHTML = `<span class="ok">✅ No underpayment detected. Your pay appears correct.</span>`;
     }
-  } catch (error) {
+  } catch (_) {
     // Hide loading and show error
     document.getElementById("loading").style.display = "none";
     document.getElementById("result").style.display = "block";
