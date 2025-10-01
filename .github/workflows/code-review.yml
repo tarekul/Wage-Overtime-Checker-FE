@@ -1,0 +1,40 @@
+name: Code Review
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Get PR Diff / Files Changed
+        id: diff
+        run: |
+          # Fetch the base branch to compare against
+          git fetch origin ${{ github.base_ref }} --depth=1
+
+          # List all files changed in this PR
+          git diff --name-only origin/${{ github.base_ref }} > changed_files.txt
+
+          # Print them for debugging
+          cat changed_files.txt
+
+          # Save the list as a GitHub Actions environment variable
+          echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
+
+      - name: Run ESLint
+        run: |
+          npm run lint -- $(cat changed_files.txt) || echo "No changed files to lint"
