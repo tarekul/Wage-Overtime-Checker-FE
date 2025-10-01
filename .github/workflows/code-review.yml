@@ -23,7 +23,7 @@ jobs:
       - name: Get PR Diff / Files Changed
         id: diff
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE=${{ github.base_ref }}
             git fetch origin $BASE --depth=1
             git diff --name-only origin/$BASE > changed_files.txt
