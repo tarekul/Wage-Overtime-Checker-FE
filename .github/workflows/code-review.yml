@@ -23,11 +23,18 @@ jobs:
       - name: Get PR Diff / Files Changed
         id: diff
         run: |
+          # Determine the base branch
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE=${{ github.base_ref }}
+          else
+            BASE=main
+          fi
+
           # Fetch the base branch to compare against
-          git fetch origin ${{ github.base_ref }} --depth=1
+          git fetch origin $BASE --depth=1
 
           # List all files changed in this PR
-          git diff --name-only origin/${{ github.base_ref }} > changed_files.txt
+          git diff --name-only origin/${BASE} > changed_files.txt
 
           # Print them for debugging
           cat changed_files.txt
