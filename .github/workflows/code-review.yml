@@ -23,23 +23,19 @@ jobs:
       - name: Get PR Diff / Files Changed
         id: diff
         run: |
-          # Determine the base branch
-          BASE=main
-          if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
             BASE=${{ github.base_ref }}
+            git fetch origin $BASE --depth=1
+            git diff --name-only origin/$BASE > changed_files.txt
+          else 
+            # push event -> compare against previous commit
+            git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
           fi
 
-          # Fetch the base branch to compare against
-          git fetch origin $BASE --depth=1
-
-          # List all files changed in this PR
-          git diff --name-only origin/${BASE} > changed_files.txt
-
-          # Print them for debugging
+          echo "Changed files:"
           cat changed_files.txt
 
-          # Save the list as a GitHub Actions environment variable
-          echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
+          printf "CHANGED_FILES='%s'\n" "$(cat changed_files.txt)" >> $GITHUB_ENV
 
       - name: Run ESLint
         run: |
