@@ -44,16 +44,3 @@ jobs:
       - name: Run ESLint
         run: |
           npm run lint -- $(cat changed_files.txt) || echo "No changed files to lint"
-
-      - name: AI PR Review (placeholder)
-        run: |
-          if [ -s changed_files.txt]; then
-            echo "Sending changed files to AI for review:"
-            cat changed_files.txt
-            # Example: Call your AI API here, e.g.,
-            # curl -X POST https://api.your-ai.com/review \
-            #      -H "Authorization: Bearer $AI_API_KEY" \
-            #      -F "files=@changed_files.txt"
-          else
-            echo "No changed files to send to AI"
-          fi
