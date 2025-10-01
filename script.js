@@ -5,6 +5,8 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
   document.getElementById("loading").style.display = "block";
   document.getElementById("result").style.display = "none";
 
+  console.log("test");
+
   const data = {
     hoursWorked: parseFloat(document.getElementById("hoursWorked").value),
     hourlyRate: parseFloat(document.getElementById("hourlyRate").value),
