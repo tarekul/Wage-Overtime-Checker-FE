@@ -92,7 +92,7 @@ jobs:
 
             const data = await response.json();
 
-            // Gemini returns text in candidates[0].content[0].text
-            const reviewText = data.candidates?.[0]?.content?.[0]?.text || 'No comments generated';
+            // Gemini returns text in candidates[0].content.parts[0].text
+            const reviewText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No comments generated';
 
             console.log('AI Review Output:\n', reviewText);
