@@ -60,7 +60,6 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const fetch = require('node-fetch');
 
             //Read the PR diff
             const diff = fs.readFileSync('changes.diff', 'utf-8');
