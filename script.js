@@ -15,7 +15,7 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch(
+    var res = await fetch(
       "https://wage-overtime-checker.onrender.com/check-pay",
       {
         method: "POST",
