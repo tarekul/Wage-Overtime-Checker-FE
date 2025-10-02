@@ -46,4 +46,11 @@ jobs:
 
       - name: Run ESLint
         run: |
-          npm run lint -- $(cat changed_files.txt) || echo "No changed files to lint"
+          JS_FILES=$(grep -E '\.jsx?$' changed_files.txt || true)
+          if [ -n "$JS_FILES" ]; then
+            echo "Linting changed JS files:"
+            echo "$JS_FILES"
+            npm run lint -- $JS_FILES
+          else
+            echo "No changed JS files to lint"
+          fi
