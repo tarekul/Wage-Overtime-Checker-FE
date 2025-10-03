@@ -101,3 +101,16 @@ jobs:
               console.error('No AI output generated. Check API key, request payload, or diff content.');
             }
             console.log('AI Review Output:\n', reviewText || 'No comments generated');
+
+            // Post review comment on PR
+            if (context.payload.pull_request) {
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: 'COMMENT',
+                body: reviewText
+              });
+            } else {
+              console.log("Not a pull request event, skipping PR review.");
+            }
