@@ -100,11 +100,14 @@ jobs:
 
             console.log('Full API response:', JSON.stringify(data, null, 2));
 
-            const reviewText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!reviewText) {
-              console.error('No AI output generated. Check API key, request payload, or diff content.');
+            let reviewText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+            if (!reviewText || reviewText.toLowerCase().includes("no comments")) {
+              console.log("Skipping review: AI output empty or unhelpful.");
+              return; // prevents trying to post an empty review
             }
-            console.log('AI Review Output:\n', reviewText || 'No comments generated');
+
+            console.log('AI Review Output:\n', reviewText);
 
             // Post review comment on PR
             if (context.payload.pull_request) {
