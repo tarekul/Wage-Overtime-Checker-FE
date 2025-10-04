@@ -102,7 +102,7 @@ jobs:
 
             let reviewText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
-            if (!reviewText || reviewText.toLowerCase().includes("no comments")) {
+            if (!reviewText) {
               console.log("Skipping review: AI output empty or unhelpful.");
               return; // prevents trying to post an empty review
             }
