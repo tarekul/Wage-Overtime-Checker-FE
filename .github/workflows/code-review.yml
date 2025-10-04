@@ -34,10 +34,15 @@ jobs:
             git fetch origin $BASE --depth=1
             git diff --name-only origin/$BASE > changed_files.txt
             git diff origin/$BASE > changes.diff
-          else 
-            # push event -> compare against previous commit
-            git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
-            git diff ${{ github.event.before }} ${{ github.sha }} > changes.diff
+          else
+            if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+              # first commit on branch
+              git diff --name-only ${{ github.sha }} > changed_files.txt
+              git show ${{ github.sha }} > changes.diff
+            else
+              git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
+              git diff ${{ github.event.before }} ${{ github.sha }} > changes.diff
+            fi
           fi
 
           echo "Changed files:"
