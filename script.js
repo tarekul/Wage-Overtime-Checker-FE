@@ -1,9 +1,14 @@
 document.getElementById("payForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Show loading state
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("result").style.display = "none";
+  const loadingDiv = document.getElementById("loading");
+  const resultDiv = document.getElementById("result");
+  const statusMessage = document.getElementById("status-message");
+
+  // Show loading state and announce to screen readers
+  loadingDiv.style.display = "block";
+  resultDiv.style.display = "none";
+  statusMessage.textContent = "Checking your pay, please wait...";
 
   const data = {
     hoursWorked: parseFloat(document.getElementById("hoursWorked").value),
@@ -26,9 +31,10 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
 
     const result = await res.json();
 
-    // Hide loading state
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("result").style.display = "block";
+    // Hide loading state and show result
+    loadingDiv.style.display = "none";
+    resultDiv.style.display = "block";
+    statusMessage.textContent = "Your report has been generated.";
 
     if (result.message) {
       document.getElementById("expected").innerText = "";
@@ -63,12 +69,20 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
     }
   } catch (error) {
     // Hide loading and show error
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("result").style.display = "block";
+    loadingDiv.style.display = "none";
+    resultDiv.style.display = "block";
+    statusMessage.textContent = `Error: ${
+      error.message || error
+    }. Please try again later.`;
     document.getElementById(
       "message"
     ).innerHTML = `<span class="violation">❌ Error: ${
       error.message || error
     }. Please try again later.</span>`;
+  } finally {
+    // Clear the status message after a short delay
+    setTimeout(() => {
+      statusMessage.textContent = "";
+    }, 5000);
   }
 });

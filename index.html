@@ -52,13 +52,17 @@
         </select>
 
         <button type="submit">Check My Pay</button>
-        <div
-          id="loading"
-          style="display: none; color: #2563eb; font-weight: bold"
-        >
+        <div id="loading">
           <span id="loadingIcon">🔍</span> Checking your pay, please wait...
         </div>
       </form>
+
+      <div
+        id="status-message"
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+      ></div>
 
       <div id="result">
         <h3>Your Report</h3>
