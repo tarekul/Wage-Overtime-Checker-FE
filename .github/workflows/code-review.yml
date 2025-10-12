@@ -51,7 +51,7 @@ jobs:
           echo "Preview of changes.diff (first 50 lines):"
           head -n 50 changes.diff
 
-          printf "CHANGED_FILES='%s'\n" "$(cat changed_files.txt)" >> $GITHUB_ENV
+          echo "CHANGED_FILES=$(paste -sd ' ' changed_files.txt)" >> $GITHUB_ENV
 
       - name: Run ESLint
         run: |

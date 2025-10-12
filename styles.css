@@ -104,6 +104,13 @@ button:hover {
   background: var(--primary-dark);
 }
 
+#loading {
+  display: none;
+  color: #2563eb;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
 #result {
   margin-top: 2rem;
   padding: 1.5rem;
@@ -146,6 +153,18 @@ button:hover {
   to {
     transform: rotate(360deg);
   }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* 📱 Mobile responsiveness */
