@@ -52,19 +52,12 @@
         </select>
 
         <button type="submit">Check My Pay</button>
-        <div id="loading">
+        <div id="loading" role="status" aria-live="polite" aria-atomic="true">
           <span id="loadingIcon">🔍</span> Checking your pay, please wait...
         </div>
       </form>
 
-      <div
-        id="status-message"
-        class="sr-only"
-        role="status"
-        aria-live="polite"
-      ></div>
-
-      <div id="result">
+      <div id="result" role="status" aria-live="polite" aria-atomic="true">
         <h3>Your Report</h3>
         <p id="expected"></p>
         <p id="overtime"></p>
