@@ -1,8 +1,6 @@
-name: Code Review
+name: AI Code Review
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -14,57 +12,73 @@ jobs:
   code-review:
     runs-on: ubuntu-latest
     steps:
+      # Checkout repo
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
+      # Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      - name: Get PR Diff / Files Changed
+      # Get latest commit diff and filter code files
+      - name: Get Latest Commit Diff / Code Files
         id: diff
         run: |
-          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
-            BASE=${{ github.base_ref }}
-            git fetch origin $BASE --depth=1
-            git diff --name-only origin/$BASE > changed_files.txt
-            git diff origin/$BASE > changes.diff
+          CODE_EXTENSIONS="\.js$|\.jsx$|\.ts$|\.tsx$|\.py$|\.html$|\.css$|\.scss$|\.json$|\.java$|\.cpp$|\.c$|\.rb$|\.go$|\.rs$|\.php$|\.kt$|\.swift$|\.sh$"
+
+          LAST_COMMIT=${{ github.sha }}
+          PREV_COMMIT=${{ github.event.before }}
+
+          echo "Comparing commit $PREV_COMMIT -> $LAST_COMMIT"
+
+          # List changed files in latest commit
+          git diff --name-only $PREV_COMMIT $LAST_COMMIT > changed_files.txt
+
+          # Filter only code files
+          grep -E "$CODE_EXTENSIONS" changed_files.txt > code_files.txt || true
+
+          # Ensure file exists
+          touch code_files.txt
+
+          # Generate diff of code files only
+          if [ -s code_files.txt ]; then
+            git diff $PREV_COMMIT $LAST_COMMIT -- $(cat code_files.txt) > changes.diff
           else
-            if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-              # first commit on branch
-              git diff --name-only ${{ github.sha }} > changed_files.txt
-              git show ${{ github.sha }} > changes.diff
-            else
-              git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
-              git diff ${{ github.event.before }} ${{ github.sha }} > changes.diff
-            fi
+            echo "No code files changed in the latest commit."
+            touch changes.diff
           fi
 
-          echo "Changed files:"
-          cat changed_files.txt
+          echo "Changed code files:"
+          cat code_files.txt
 
           echo "Preview of changes.diff (first 50 lines):"
           head -n 50 changes.diff
 
-          echo "CHANGED_FILES=$(paste -sd ' ' changed_files.txt)" >> $GITHUB_ENV
+          # Save code files list to env
+          printf "CHANGED_FILES='%s'\n" "$(cat code_files.txt)" >> $GITHUB_ENV
 
+      # Run ESLint on JS/JSX code files
       - name: Run ESLint
         run: |
-          JS_FILES=$(grep -E '\.jsx?$' changed_files.txt || true)
+          JS_FILES=$(grep -E '\.jsx?$' code_files.txt || true)
           if [ -n "$JS_FILES" ]; then
-            echo "Linting changed JS files:"
+            echo "Linting JS/JSX files:"
             echo "$JS_FILES"
             npm run lint -- $JS_FILES
           else
-            echo "No changed JS files to lint"
+            echo "No JS/JSX files to lint."
           fi
 
-      - name: AI Code Review with Gemini 2.5 Flash
+      # AI Code Review with Gemini 2.5 Flash
+      - name: AI Code Review
         uses: actions/github-script@v7
         env:
           GCP_API_KEY: ${{ secrets.GCP_API_KEY }}
@@ -73,13 +87,19 @@ jobs:
           script: |
             const fs = require('fs');
 
-            //Read the PR diff
+            // Read code diff
             const diff = fs.readFileSync('changes.diff', 'utf-8');
 
-            // Escape double quotes for JSON
-            const escapedDiff = diff.replace(/"/g, '\\"');
+            // Sanitize diff: remove unprintable chars & escape quotes
+            const sanitizedDiff = diff.replace(/[^\x20-\x7E\n]/g, '');
+            const escapedDiff = sanitizedDiff.replace(/"/g, '\\"');
 
-            // Prepare the JSON payload for Gemini
+            if (!escapedDiff.trim()) {
+              console.log("No code changes to review. Skipping AI comment.");
+              return;
+            }
+
+            // Prepare AI payload
             const body = {
               contents: [
                 {
@@ -91,6 +111,7 @@ jobs:
                 }
               ]
             };
+
             // Call Gemini API
             const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
               method: 'POST',
@@ -102,27 +123,20 @@ jobs:
             });
 
             const data = await response.json();
-
-            console.log('Full API response:', JSON.stringify(data, null, 2));
-
-            let reviewText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+            const reviewText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
             if (!reviewText) {
-              console.log("Skipping review: AI output empty or unhelpful.");
-              return; // prevents trying to post an empty review
+              console.log("AI returned no review text. Skipping PR comment.");
+              return;
             }
 
-            console.log('AI Review Output:\n', reviewText);
+            console.log("AI Review Output:\n", reviewText);
 
             // Post review comment on PR
-            if (context.payload.pull_request) {
-              await github.rest.pulls.createReview({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                event: 'COMMENT',
-                body: reviewText
-              });
-            } else {
-              console.log("Not a pull request event, skipping PR review.");
-            }
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              event: 'COMMENT',
+              body: reviewText
+            });
