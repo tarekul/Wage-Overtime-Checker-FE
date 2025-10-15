@@ -42,9 +42,10 @@ header p {
   line-height: 1.5;
 }
 
-.container {
+main {
   background: var(--card-bg);
-  width: 42vw;
+  max-width: 500px;
+  width: 90%;
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
