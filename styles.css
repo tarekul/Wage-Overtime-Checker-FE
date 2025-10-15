@@ -44,8 +44,7 @@ header p {
 
 .container {
   background: var(--card-bg);
-  max-width: 500px;
-  width: 90%;
+  width: 450px;
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -117,6 +116,7 @@ button:hover {
   background: var(--bg);
   border-radius: 0.75rem;
   display: none;
+  box-sizing: border-box;
 }
 
 #result h3 {
@@ -144,6 +144,18 @@ button:hover {
 #loadingIcon {
   display: inline-block;
   animation: spin 1s linear infinite;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 @keyframes spin {
